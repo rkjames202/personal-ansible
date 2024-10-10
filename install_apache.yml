@@ -1,0 +1,24 @@
+---
+# Playbook will be ran against all hosts
+- hosts: all
+  # Tasks will be ran as an elevated user
+  become: true
+  tasks:
+    # Name of the play
+    - name: update repository index
+      # Module being used is 'apt'
+      apt:
+        # Action here is to update application index on server
+        update_cache: yes
+
+    - name: install apache2 package
+      apt:
+        # Name of the application package being installed
+        name: apache2
+        # Makes sure the application packages are the latest versions available
+        state: latest
+
+    - name: add php support for apache
+      apt:
+        name: libapache2-mod-php
+        state: latest
