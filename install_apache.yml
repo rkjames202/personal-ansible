@@ -5,44 +5,15 @@
   become: true
   tasks:
     # Name of the play
-    - name: update repository index
-      # Module being used is 'apt'
-      apt:
-        # Action here is to update application index on server
-        update_cache: yes
-      # Will only run the previous tasks if server's Linux distribution is Ubuntu
-      when: ansible_distribution = "Ubuntu"
-
-    - name: install apache2 package
-      apt:
-        # Name of the application package being installed
-        name: apache2
+    - name: install apache package, php support for and update repository
+      # Package will use whatever package manager the target server uses
+      package:
+        # Names of the application packages being installed
+        name:
+          # Variables being referenced for application packages
+          - "{{ apache_package }}"
+          - "{{ php_package }}"
         # Makes sure the application packages are the latest versions available
         state: latest
-      when: ansible_distribution = "Ubuntu"
-
-    - name: add php support for apache
-      apt:
-        # Ubuntu/Debian's version of PHP
-        name: libapache2-mod-php
-        state: latest
-      when: ansible_distribution = "Ubuntu"
-
-    # The below tasks will be ran against server running CentOS
-    - name: update repository index
-      dnf:
+        # Action here is to update application index on server
         update_cache: yes
-      when: ansible_distribution = "CentOS"
-
-    - name: install apache2 package
-      dnf:
-        # CentOS's version of apache
-        name: httpd
-        state: latest
-      when: ansible_distribution = "CentOS"
-
-    - name: add php support for apache
-      dnf:
-        name: php
-        state: latest
-      when: ansible_distribution = "CentOS"  
