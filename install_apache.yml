@@ -10,6 +10,8 @@
       apt:
         # Action here is to update application index on server
         update_cache: yes
+      # Will only run the previous tasks if server's Linux distribution is Ubuntu
+      when: ansible_distribution = "Ubuntu"
 
     - name: install apache2 package
       apt:
@@ -17,8 +19,30 @@
         name: apache2
         # Makes sure the application packages are the latest versions available
         state: latest
+      when: ansible_distribution = "Ubuntu"
 
     - name: add php support for apache
       apt:
+        # Ubuntu/Debian's version of PHP
         name: libapache2-mod-php
         state: latest
+      when: ansible_distribution = "Ubuntu"
+
+    # The below tasks will be ran against server running CentOS
+    - name: update repository index
+      dnf:
+        update_cache: yes
+      when: ansible_distribution = "CentOS"
+
+    - name: install apache2 package
+      dnf:
+        # CentOS's version of apache
+        name: httpd
+        state: latest
+      when: ansible_distribution = "CentOS"
+
+    - name: add php support for apache
+      dnf:
+        name: php
+        state: latest
+      when: ansible_distribution = "CentOS"  
