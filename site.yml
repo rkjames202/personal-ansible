@@ -1,0 +1,62 @@
+# The following playbook is for targeting specific nodes
+---
+- hosts: all
+  become: true
+  pre_tasks:
+    - name: install updates on CentOS servers
+      dnf:
+        update_only: yes
+        update_cache: yes
+      when: ansible_distribution == "CentOS"
+
+    - name: install updates on Ubuntu servers
+      apt:
+        upgrade: dist
+        update_cache: yes
+      when: ansible_distribution == "Ubuntu"
+
+# Tasks following this will only ran against servers in the 'web_server' group
+- hosts: web_servers
+
+  become: true
+  tasks:
+    - name: install apache package, php support for and update repository for Ubuntu servers
+      package:
+        name:
+          - apache2
+          - libapache2-mod-php
+        state: latest
+      when: ansible_distribution == "Ubuntu"
+
+    - name: install apache package, php support for and update repository for CentOS servers
+      dnf:
+        name:
+          - httpd
+          - php
+        state: latest
+        when: ansible_distribution == "CentOS
+
+# Tasks following this will only ran against servers in the 'db_servers' group
+- hosts: db_servers
+  become: true
+  tasks:
+    - name: install mariadb package on Cent OS servers
+      dnf:
+        name: mariadb
+        state: latest
+      when: ansible_distribution == "CentOS"
+
+    - name: install mariadb package on Ubuntu servers
+      apt:
+        name: mariadb-server
+        state: latest
+      when: ansible_distribution == "Ubuntu"
+
+# Tasks following this will only ran against servers in the 'file_server' group
+- hosts: file_servers
+  become: true
+  tasks:
+    - name: install samba package
+      package:
+        name: samba
+        state: latest
