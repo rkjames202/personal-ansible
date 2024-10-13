@@ -4,6 +4,7 @@
   become: true
   pre_tasks:
     - name: install updates on CentOS servers
+      # Tags to provide meta data to plays
       tags: always
       dnf:
         update_only: yes
@@ -39,6 +40,18 @@
           - php
         state: latest
         when: ansible_distribution == "CentOS
+
+    # The following play will copy the default HTML file to the web servers
+    - name: Copy default HTML file for site
+      tags: apache,apache2, httpd
+      copy:
+        src: default_site.html
+        dest: /var/www/html/index.html
+        # No one will be able to change or access this file unless they have access to the root
+        owner: root
+        group: root
+        # Permissions of the file
+        mode: 0644
 
 # Tasks following this will only ran against servers in the 'db_servers' group
 - hosts: db_servers
