@@ -18,6 +18,25 @@
         update_cache: yes
       when: ansible_distribution == "Ubuntu"
 
+- hosts: workstations
+  become: true
+  tasks:
+    # Allows servers to unzip zip files from the command line
+    - name: Install unzip
+      package:
+        name: unzip
+
+    - name: Install Terraform
+      # Requires the 'unzip' package installed previously
+      unarchive:
+        src: https://releases.hashicorp.com/terraform/1.9.7/terraform_1.9.7_linux_amd64.zip
+        dest: /usr/local/bin
+        # Ansible won't look for the source directory locally
+        remote_src: yes
+        mode: 0755
+        owner: root
+        group: root
+
 # Tasks following this will only ran against servers in the 'web_server' group
 - hosts: web_servers
 
