@@ -1,0 +1,42 @@
+---
+# This playbook will perform all the necessary tasks before provisioning/configuring servers
+- hosts: all
+  become: true
+  pre_tasks:
+    - name: install updates on CentOS servers
+      tags: always
+      dnf:
+        update_only: yes
+        update_cache: yes
+      when: ansible_distribution == "CentOS"
+
+    - name: install updates on Ubuntu servers
+      tags: always
+      apt:
+        upgrade: dist
+        update_cache: yes
+      when: ansible_distribution == "Ubuntu"
+
+- hosts: all
+  become: true
+  tasks:
+    - name: Create user
+      tags: always
+      user:
+        name: russell
+        groups: root
+
+    - name: Add SSH key for user
+      tags: always
+      authorized_key:
+          user: russell
+          key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK1ZB9nEsRYHJktfzSqjfpFTOgIWLFoVGmAPCxAvDGiy ansible"
+    
+    - name: Add sudoers file for russell
+      tags: always
+      copy: 
+        src: sudoer_russell
+        dest: /etc/sudoers.d/russell
+        owner: root
+        group: root
+        mode: 0440
