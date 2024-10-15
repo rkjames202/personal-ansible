@@ -59,6 +59,36 @@
           - php
         state: latest
         when: ansible_distribution == "CentOS
+    
+    # Play to start and enable the httpd/apache package on CentOS servers
+    - name: Start httpd on CentOS servers
+      tags: apache,centos
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+      when: ansible_distribution = CentOS
+      # Will capture the state of httpd in a variable
+      register: httpd
+    
+    # Will restart the httpd service using the previously captured 'httpd' variable
+    - name:  Restart httpd service on CentOS servers
+      tags: apache, centos,httpd
+      service: 
+        name: httpd
+        state: restarted
+      # Play will only run if 'httpd' variable is changed
+      when: httpd.changed
+    
+    # Changing the admin e-mail on CentOS servers
+    - name: Change e-mail address for admin
+      tags: apache,centos,httpd
+      lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: '^ServerAdmin'
+        line: ServerAdmin russelljames202@gmail.com
+      when: ansible_distribution == "CentOS"
+
 
     # The following play will copy the default HTML file to the web servers
     - name: Copy default HTML file for site
