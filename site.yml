@@ -3,20 +3,32 @@
 - hosts: all
   become: true
   pre_tasks:
-    - name: install updates on CentOS servers
+    - name: Update repository cache on Ubuntu servers
       # Tags to provide meta data to plays
       tags: always
       dnf:
-        update_only: yes
         update_cache: yes
+        # Will not register a change when running this playbook
+        changed_when: false
       when: ansible_distribution == "CentOS"
 
-    - name: install updates on Ubuntu servers
+    - name: Update repository cache on CentOS servers
       tags: always
       apt:
-        upgrade: dist
         update_cache: yes
+      changed_when: false
       when: ansible_distribution == "Ubuntu"
+
+- hosts: all
+  become: true
+  tasks:
+    # This task add an ssh key for previously created user
+    - name: Add SSH key for user
+      tags: always
+      authorized_key:
+        user: russell
+        # Key will allow the user to log into servers without a password/passphrase
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK1ZB9nEsRYHJktfzSqjfpFTOgIWLFoVGmAPCxAvDGiy ansible"
 
 - hosts: workstations
   become: true
@@ -59,7 +71,7 @@
           - php
         state: latest
         when: ansible_distribution == "CentOS
-    
+
     # Play to start and enable the httpd/apache package on CentOS servers
     - name: Start httpd on CentOS servers
       tags: apache,centos
@@ -70,25 +82,24 @@
       when: ansible_distribution = CentOS
       # Will capture the state of httpd in a variable
       register: httpd
-    
+
     # Will restart the httpd service using the previously captured 'httpd' variable
-    - name:  Restart httpd service on CentOS servers
+    - name: Restart httpd service on CentOS servers
       tags: apache, centos,httpd
-      service: 
+      service:
         name: httpd
         state: restarted
       # Play will only run if 'httpd' variable is changed
       when: httpd.changed
-    
+
     # Changing the admin e-mail on CentOS servers
     - name: Change e-mail address for admin
       tags: apache,centos,httpd
       lineinfile:
         path: /etc/httpd/conf/httpd.conf
-        regexp: '^ServerAdmin'
+        regexp: "^ServerAdmin"
         line: ServerAdmin russelljames202@gmail.com
       when: ansible_distribution == "CentOS"
-
 
     # The following play will copy the default HTML file to the web servers
     - name: Copy default HTML file for site
