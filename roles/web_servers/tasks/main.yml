@@ -19,6 +19,7 @@
      path: /etc/httpd/conf/httpd.conf
      regexp: '^ServerAdmin'
      line: ServerAdmin russelljames202@gmail.com
+  # Task will only work in CentOS, Ubuntu has a different file location for this
    when: ansible_distribution == "CentOS"
    notify: restart_apache
  
