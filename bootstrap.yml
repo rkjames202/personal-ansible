@@ -29,12 +29,12 @@
     - name: Add SSH key for user
       tags: always
       authorized_key:
-          user: russell
-          key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK1ZB9nEsRYHJktfzSqjfpFTOgIWLFoVGmAPCxAvDGiy ansible"
-    
+        user: russell
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIK1ZB9nEsRYHJktfzSqjfpFTOgIWLFoVGmAPCxAvDGiy ansible"
+
     - name: Add sudoers file for russell
       tags: always
-      copy: 
+      copy:
         src: sudoer_russell
         dest: /etc/sudoers.d/russell
         owner: root
