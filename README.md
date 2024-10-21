@@ -1,3 +1,3 @@
-# ansible
+# personal-ansible
 
-Test
+- Ansible playbook used for provisioning various types of servers
